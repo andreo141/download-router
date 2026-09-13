@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Download Router",
+  "version": "1.0",
+  "description": "Helps organizing your downloads into subfolders based on pattern matching rules.",
+  "icons": {
+    "48": "icons/border-48.png"
+  },
+  "permissions": [
+    "downloads",
+    "storage"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "downloadrouter@andreo141"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "scripts": ["downloadRouter.js"]
+  }
+}
