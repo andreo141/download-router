@@ -1,16 +1,16 @@
 let subDirs = ["looperman"]; // v1: should be populated in UI, eventually this will be a dictionary i think
-let overwrittenId;
+const downloadMap = new Map();
 
 async function routeDownloadFile(file, item, delta) {
   for (const dir of subDirs) {
     if (file.includes(dir)) {
-      overwrittenId = delta.id;
       try {
-        await browser.downloads.download({
+        const newDownloadId = await browser.downloads.download({
           url: `${item[0].url}`,
           filename: `${dir}/${file}`,
           conflictAction: "uniquify",
         });
+        downloadMap.set(newDownloadId, delta.id);
       } catch (err) {
         console.error("Failed to move local download to subdirectory");
       }
@@ -29,7 +29,11 @@ async function listener(downloadDelta) {
 
       for (const dir of subDirs) {
         if (fullPath.includes(`/${dir}/`)) {
-          await browser.downloads.removeFile(overwrittenId);
+          const overWrittenId = downloadMap.get(downloadDelta.id);
+          if (overWrittenId) {
+            await browser.downloads.removeFile(overWrittenId);
+            downloadMap.delete(downloadDelta.id);
+          }
           return;
         }
       }
