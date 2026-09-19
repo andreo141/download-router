@@ -10,7 +10,7 @@ Firefox has no equivalent to Chrome's `downloads.onDeterminingFilename` API (see
 
 1. Lets the download complete normally in your default downloads folder.
 2. Checks the filename against your configured routing rules.
-3. If it matches, re-downloads the file into the target subfolder.
+3. If it matches, re-downloads the file (from disk) into the target subfolder.
 4. Removes the original copy once the routed copy finishes.
 
 This briefly duplicates the file on disk, but the end result is one file, in the desired folder.
