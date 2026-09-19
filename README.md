@@ -27,6 +27,3 @@ Because of the mechanism above, a few download types won't be routed. In every c
 
 - `downloads` — to observe, start, and remove downloads.
 - `storage` — to store your routing rules (`storage.local`) and track in-flight routed downloads (`storage.session`).
-## Contributing
-
-Issues and PRs welcome. See [open limitations](#known-limitations) before filing a bug about a download that didn't get routed — check whether it falls into one of the categories above first.
