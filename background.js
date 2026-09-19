@@ -1,13 +1,20 @@
-let subDirs = ["looperman"]; // v1: should be populated in UI, eventually this will be a dictionary i think
+const getRules = async () => {
+  const data = await browser.storage.local.get("rules");
+  return data.rules || [];
+};
+
 const downloadMap = new Map();
 
+browser.storage.session.set({ downloadMap });
+
 async function routeDownloadFile(file, item, delta) {
-  for (const dir of subDirs) {
-    if (file.includes(dir)) {
+  const rules = await getRules();
+  for (const rule of rules) {
+    if (file.includes(rule)) {
       try {
         const newDownloadId = await browser.downloads.download({
           url: `${item[0].url}`,
-          filename: `${dir}/${file}`,
+          filename: `${rule}/${file}`,
           conflictAction: "uniquify",
         });
         downloadMap.set(newDownloadId, delta.id);
@@ -27,8 +34,9 @@ async function listener(downloadDelta) {
       const filename = downloadItem[0].filename.split("/").pop();
       const fullPath = downloadItem[0].filename;
 
-      for (const dir of subDirs) {
-        if (fullPath.includes(`/${dir}/`)) {
+      const rules = await getRules();
+      for (const rule of rules) {
+        if (fullPath.includes(`/${rule}/`)) {
           const overWrittenId = downloadMap.get(downloadDelta.id);
           if (overWrittenId) {
             await browser.downloads.removeFile(overWrittenId);
