@@ -1,6 +1,6 @@
 <img width="80" height="80" alt="download" src="https://github.com/user-attachments/assets/10fd6ab8-8d6f-4b63-8c88-099eccdc7020" />
 
-# Download Router
+# Download Router (v1)
 
 A Firefox extension that automatically sorts your downloads into subfolders based on filename matching rules.
 
@@ -10,7 +10,7 @@ Firefox has no equivalent to Chrome's `downloads.onDeterminingFilename` API (see
 
 1. Lets the download complete normally in your default downloads folder.
 2. Checks the filename against your configured routing rules.
-3. If it matches, re-downloads the file (from disk) into the target subfolder.
+3. If it matches, re-downloads the file into the target subfolder.
 4. Removes the original copy once the routed copy finishes.
 
 This briefly duplicates the file on disk, but the end result is one file, in the desired folder.
