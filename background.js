@@ -8,35 +8,41 @@ const getDownloadMap = async () => {
   return data.downloadMap || new Map();
 };
 
-async function routeDownloadFile(file, item, delta) {
+async function routeDownloadFile(file, downloadItem, delta) {
   const rules = await getRules();
   const downloadMap = await getDownloadMap();
+
   for (const rule of rules) {
     if (file.includes(rule)) {
       try {
-        const newDownloadId = await browser.downloads.download({
-          url: `${item[0].url}`,
+        const request = {
+          url: downloadItem.url,
           filename: `${rule}/${file}`,
           conflictAction: "uniquify",
-        });
+          ...(downloadItem.referrer && {
+            headers: [{ name: "Referer", value: downloadItem.referrer }],
+          }),
+        };
+        const newDownloadId = await browser.downloads.download(request);
         downloadMap.set(newDownloadId, delta.id);
-        browser.storage.session.set({ downloadMap });
+        await browser.storage.session.set({ downloadMap });
       } catch (err) {
-        console.error("Failed to move local download to subdirectory");
+        console.error("Failed to move local download to subdirectory", err);
       }
+      break;
     }
   }
 }
 
 async function downloadsListener(downloadDelta) {
-  if (downloadDelta.state.current === "complete")
+  if (downloadDelta.state?.current === "complete")
     try {
-      const downloadItem = await browser.downloads.search({
+      const [downloadItem] = await browser.downloads.search({
         id: downloadDelta.id,
       });
 
-      const filename = downloadItem[0].filename.split("/").pop();
-      const fullPath = downloadItem[0].filename;
+      const filename = downloadItem.filename.split("/").pop();
+      const fullPath = downloadItem.filename;
 
       const rules = await getRules();
       const downloadMap = await getDownloadMap();
@@ -47,6 +53,7 @@ async function downloadsListener(downloadDelta) {
 
           if (overWrittenId) {
             await browser.downloads.removeFile(overWrittenId);
+            await browser.downloads.erase({ id: overWrittenId });
             downloadMap.delete(downloadDelta.id);
             await browser.storage.session.set({ downloadMap });
           }
@@ -56,7 +63,7 @@ async function downloadsListener(downloadDelta) {
 
       await routeDownloadFile(filename, downloadItem, downloadDelta);
     } catch (err) {
-      console.error("Failed to search download");
+      console.error("Failed to search download", err);
     }
 }
 
