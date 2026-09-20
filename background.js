@@ -1,14 +1,16 @@
 const getRules = async () => {
   const data = await browser.storage.local.get("rules");
-  return data.rules || [];
+  return data.rules;
 };
 
-const downloadMap = new Map();
-
-browser.storage.session.set({ downloadMap });
+const getDownloadMap = async () => {
+  const data = await browser.storage.session.get("downloadMap");
+  return data.downloadMap || new Map();
+};
 
 async function routeDownloadFile(file, item, delta) {
   const rules = await getRules();
+  const downloadMap = await getDownloadMap();
   for (const rule of rules) {
     if (file.includes(rule)) {
       try {
@@ -18,6 +20,7 @@ async function routeDownloadFile(file, item, delta) {
           conflictAction: "uniquify",
         });
         downloadMap.set(newDownloadId, delta.id);
+        browser.storage.session.set({ downloadMap });
       } catch (err) {
         console.error("Failed to move local download to subdirectory");
       }
@@ -25,22 +28,27 @@ async function routeDownloadFile(file, item, delta) {
   }
 }
 
-async function listener(downloadDelta) {
+async function downloadsListener(downloadDelta) {
   if (downloadDelta.state.current === "complete")
     try {
       const downloadItem = await browser.downloads.search({
         id: downloadDelta.id,
       });
+
       const filename = downloadItem[0].filename.split("/").pop();
       const fullPath = downloadItem[0].filename;
 
       const rules = await getRules();
+      const downloadMap = await getDownloadMap();
+
       for (const rule of rules) {
         if (fullPath.includes(`/${rule}/`)) {
           const overWrittenId = downloadMap.get(downloadDelta.id);
+
           if (overWrittenId) {
             await browser.downloads.removeFile(overWrittenId);
             downloadMap.delete(downloadDelta.id);
+            await browser.storage.session.set({ downloadMap });
           }
           return;
         }
@@ -52,4 +60,13 @@ async function listener(downloadDelta) {
     }
 }
 
-browser.downloads.onChanged.addListener(listener);
+async function onInstalledListener() {
+  let rules = await getRules();
+  if (!rules) {
+    rules = [];
+    await browser.storage.local.set({ rules });
+  }
+}
+
+browser.runtime.onInstalled.addListener(onInstalledListener);
+browser.downloads.onChanged.addListener(downloadsListener);
