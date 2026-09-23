@@ -25,21 +25,40 @@
       -apple-system,
       sans-serif;
   }
+
   button {
     cursor: pointer;
   }
+
   .main-title {
     font-size: 24px;
     text-align: center;
   }
+
   .add-rule-wrapper {
     display: flex;
     gap: 10px;
   }
+
   .add-rule-wrapper button,
   input {
     padding: 4px;
     margin: 4px 0;
+  }
+
+  #rules-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #rules-list button {
+    visibility: hidden;
+  }
+
+  #rules-list li:hover button {
+    visibility: visible;
+    margin-left: 1rem;
   }
 
   @media (prefers-color-scheme: dark) {

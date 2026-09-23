@@ -9,9 +9,21 @@ const getRules = async () => {
 const addListElement = (rule) => {
   const listElem = document.createElement("li");
   const listText = document.createTextNode(rule);
+  const deleteBtn = Object.assign(document.createElement("button"));
+  deleteBtn.dataset.rule = rule;
+  const deleteText = document.createTextNode("delete");
+  deleteBtn.appendChild(deleteText);
   listElem.appendChild(listText);
+  listElem.appendChild(deleteBtn);
   rulesList.appendChild(listElem);
 };
+
+async function deleteRuleHandler(ruleToDelete, deleteRuleBtn) {
+  let rules = await getRules();
+  rules = rules.filter((rule) => ruleToDelete !== rule);
+  deleteRuleBtn.parentElement.remove();
+  await browser.storage.local.set({ rules });
+}
 
 async function addRuleHandler() {
   const rules = await getRules();
@@ -25,6 +37,14 @@ async function addRuleHandler() {
 
 addRuleBtn.addEventListener("click", (e) => {
   addRuleHandler();
+});
+
+rulesList.addEventListener("click", (e) => {
+  const deleteRuleBtn = e.target.closest("[data-rule]");
+  if (deleteRuleBtn) {
+    const ruleToDelete = deleteRuleBtn.dataset.rule;
+    deleteRuleHandler(ruleToDelete, deleteRuleBtn);
+  }
 });
 
 const populateExistingRules = (async () => {
