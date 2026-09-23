@@ -9,10 +9,11 @@ const getRules = async () => {
 const addListElement = (rule) => {
   const listElem = document.createElement("li");
   const listText = document.createTextNode(rule);
-  const deleteBtn = Object.assign(document.createElement("button"));
+
+  const deleteBtn = document.createElement("button");
   deleteBtn.dataset.rule = rule;
-  const deleteText = document.createTextNode("delete");
-  deleteBtn.appendChild(deleteText);
+  deleteBtn.textContent = "delete";
+
   listElem.appendChild(listText);
   listElem.appendChild(deleteBtn);
   rulesList.appendChild(listElem);
