@@ -1,7 +1,6 @@
 <img width="80" height="80" alt="download" src="https://github.com/user-attachments/assets/10fd6ab8-8d6f-4b63-8c88-099eccdc7020" />
 
 # Download Router (v1)
-
 A Firefox extension that automatically sorts your downloads into subfolders based on filename matching rules.
 
 ## How it works
@@ -22,6 +21,9 @@ Because of the mechanism above, a few download types won't be routed. In every c
 - **Private browsing windows / Multi-Account Containers** — the re-download can't replay a container- or private-session-specific cookie jar.
 - **Blob-URL downloads** (in-page "Export as PDF/CSV" style buttons) — there's no network request to re-issue.
 - **POST-triggered downloads** — the re-download is always a GET, so it can't replay a POST body.
+
+## Download
+https://addons.mozilla.org/en-US/firefox/addon/firefox-download-router/
 
 ## Permissions
 
